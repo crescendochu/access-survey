@@ -50,6 +50,7 @@ const SurveyComponent = () => {
   });
   const [imageComparisons, setImageComparisons] = useState([]);
   const [totalSteps, setTotalSteps] = useState(15);
+  const [mostRecentStepBackward, setMostRecentStepBackward] = useState(false);
 
   useEffect(
     () => {
@@ -238,12 +239,14 @@ const SurveyComponent = () => {
   const nextStep = () => {
     if (currentStep < 13) {
       setCurrentStep(currentStep + 1);
+      setMostRecentStepBackward(false);
     }
   };
 
   const previousStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      setMostRecentStepBackward(true);
     }
   };
 
@@ -399,8 +402,9 @@ const SurveyComponent = () => {
 
   useEffect(() => {
     const updateStatusAsync = async () => {
-      if (currentStep === 3) {
+      if (currentStep === 3 && mostRecentStepBackward === false) {
         await updateDataFromDB();
+        localStorage.setItem("email", answers.email);
       } 
       else if (currentStep > 3) {
         await handleSubmit();
@@ -409,6 +413,19 @@ const SurveyComponent = () => {
 
     updateStatusAsync();
   }, [currentStep]);
+
+  useEffect(() => {
+    const updateStateWithLocalStorageEmail = async () => {
+      const email = localStorage.getItem('email');
+      if (email) {
+        answers.email = email;
+        await updateDataFromDB();
+        localStorage.clear();
+      }
+    }
+    updateStateWithLocalStorageEmail()
+
+  }, [])
 
 
   const readDataIntoFrontEnd = async (data) => {
@@ -459,9 +476,9 @@ const SurveyComponent = () => {
         timestamp: serverTimestamp(),
         currentStep: currentStep,
       });
-      console.log("Document written with ID: ", docRef.id);
+      console.log("Document modified with ID: ", docRef.id);
     } catch (e) {
-      console.error("Error adding document: ", e);
+      console.error("Error modifying document: ", e);
     }
   };
 
