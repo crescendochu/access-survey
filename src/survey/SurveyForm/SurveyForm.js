@@ -429,8 +429,6 @@ const SurveyComponent = () => {
 
 
   const readDataIntoFrontEnd = async (data) => {
-    // figure out how to read it properly into state
-    console.log(data);
     setAnswers({
       name: data.name,
       email: data.email,
