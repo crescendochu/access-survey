@@ -34,7 +34,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const firestore = getFirestore(app);
 
-const formId = 0;
+const formId = 0; // should change this form by form
 
 const SurveyComponent = () => {
   const [currentStep, setCurrentStep] = useState(0);
