@@ -34,6 +34,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const firestore = getFirestore(app);
 
+const formId = 0;
+
 const SurveyComponent = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [surfaceSelection, setSurfaceSelection] = useState({
@@ -446,7 +448,7 @@ const SurveyComponent = () => {
 
   const updateDataFromDB = async () => {
     try  {
-      const docRef = doc(firestore, 'surveyAnswers', answers.email);
+      const docRef = doc(firestore, 'surveyAnswers', answers.email + "-" + formId);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
@@ -464,7 +466,7 @@ const SurveyComponent = () => {
   const handleSubmit = async () => {
     try {
       const collectionRef = collection(firestore, 'surveyAnswers');
-      const docRef = doc(collectionRef, answers.email);
+      const docRef = doc(collectionRef, answers.email + '-' + formId);
       await setDoc(docRef, {
         ...answers,
         surfaceSelection,
