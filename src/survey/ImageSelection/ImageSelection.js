@@ -113,7 +113,7 @@ return (
 />
                 </div>
             </div>
-            {/* <PageNavigations onPrevious={previousStep} onNext={nextStep} /> */}
+            <PageNavigations onPrevious={previousStep} onNext={nextStep} />
         </div>
     </div>
   );

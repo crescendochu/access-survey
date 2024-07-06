@@ -66,6 +66,9 @@ const SurveyComponent = () => {
   const [continueUrl, setContinueUrl] = useState('');
   const [singleMobilityAid, setSingleMobilityAid] = useState(false);
   const [errors, setErrors] = useState({});
+  const [startTime, setStartTime] = useState(null);
+  const [endSessionTime, setEndSessionTime] = useState(null);
+  const [endSurveyTime, setEndSurveyTime] = useState(null);
 
 
   const { id } = useParams(); 
@@ -81,6 +84,7 @@ const SurveyComponent = () => {
 
   const startSurvey = () => {
     setCurrentStep(1); // Start the survey
+    setStartTime(new Date());
   };
   
   const [answers, setAnswers] = useState({
@@ -644,6 +648,7 @@ const renderCurrentStep = () => {
               erros= {errors}
               />;
     case 35:
+      setEndSurveyTime(new Date());
       return <EndingPage 
               previousStep={previousStep} 
               continueUrl={continueUrl} // pass continueUrl
@@ -665,6 +670,9 @@ const handleSubmit = async () => {
 
   let logType = 'final'; // form is submitted 
   answers.answeredMobilityAids.push(answers.mobilityAid);
+  //do duration in seconds
+  const duration = (endSurveyTime - startTime) / 1000;
+
   try {
     const docRef = await addDoc(collection(firestore, "surveyAnswers"), {
       sessionId, 
@@ -675,8 +683,10 @@ const handleSubmit = async () => {
       imageSelections,
       imageComparisons,
       timestamp: serverTimestamp(), 
+      duration
     });
     console.log("Document written with ID: ", docRef.id);
+    console.log("Survey completed in: ", duration);
   } catch (e) {
     console.error("Error adding document: ", e);
     }

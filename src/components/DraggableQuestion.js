@@ -26,8 +26,10 @@ const DraggableQuestion = ({ questionText, inputId, instructionText, options, ha
 
   const getGridPosition = (index) => {
     // index 1-7 in one column, 8-14 in the other
-    const column = index <7 ? '1' : '2'; 
-    const row = index <7 ? index+1 : index-6; 
+    // const column = index <7 ? '1' : '2'; 
+    // const row = index <7 ? index+1 : index-6; 
+    const column = index % 2 === 0 ? '1' : '2'; // Alternating columns
+    const row = Math.floor(index / 2) + 1; // Calculate row based on index
     return { gridColumn: column, gridRow: row };
   };
 
