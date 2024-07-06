@@ -66,6 +66,9 @@ const SurveyComponent = () => {
   const [continueUrl, setContinueUrl] = useState('');
   const [singleMobilityAid, setSingleMobilityAid] = useState(false);
   const [errors, setErrors] = useState({});
+  const [startTime, setStartTime] = useState(null);
+  const [endSessionTime, setEndSessionTime] = useState(null);
+  const [endSurveyTime, setEndSurveyTime] = useState(null);
 
 
   const { id } = useParams(); 
@@ -78,8 +81,8 @@ const SurveyComponent = () => {
 
   const progressValue = (currentStep / totalSteps) * 100;
 
-
   const startSurvey = () => {
+    setStartTime(Date.now()); // Record start time when survey starts
     setCurrentStep(1); // Start the survey
   };
   
@@ -622,7 +625,7 @@ const renderCurrentStep = () => {
             />
     
     case 34: 
-    
+      setEndSessionTime(Date.now()); // Record end time when session ends
       if (answers.mobilityAidOptions.mobilityAidOptions.length === 1 ||  // if only one mobility aid option
         (answers.answeredMobilityAids && answers.answeredMobilityAids.length > 0) // if answered mobility aids exist
       ) {
@@ -644,6 +647,7 @@ const renderCurrentStep = () => {
               erros= {errors}
               />;
     case 35:
+      setEndSurveyTime(Date.now()); // Record end time when survey ends
       return <EndingPage 
               previousStep={previousStep} 
               continueUrl={continueUrl} // pass continueUrl
@@ -665,6 +669,7 @@ const handleSubmit = async () => {
 
   let logType = 'final'; // form is submitted 
   answers.answeredMobilityAids.push(answers.mobilityAid);
+  const duration = endSurveyTime - startTime; // Calculate duration of survey 
   try {
     const docRef = await addDoc(collection(firestore, "surveyAnswers"), {
       sessionId, 
@@ -674,7 +679,8 @@ const handleSubmit = async () => {
       ...answers, 
       imageSelections,
       imageComparisons,
-      timestamp: serverTimestamp(), 
+      timestamp: serverTimestamp(),
+      duration: duration 
     });
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
@@ -706,6 +712,7 @@ const logData = async () => {
 const logMobilityAidData = async () => {
   let logType = 'CompletedOneMobilityAid'; 
   answers.answeredMobilityAids.push(answers.mobilityAid);
+  const duration = endSessionTime - startTime; // Calculate duration of survey
 
   try {
     const docRef = await addDoc(collection(firestore, "surveyAnswers"), {
@@ -716,7 +723,8 @@ const logMobilityAidData = async () => {
         ...answers,
         imageSelections,
         imageComparisons,
-        timestamp: serverTimestamp()
+        timestamp: serverTimestamp(),
+        duration: duration
       });
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
