@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button, Dialog, DialogHeader, DialogBody, DialogFooter } from '@material-tailwind/react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { firestore } from '../../config';
@@ -8,6 +8,22 @@ const BreakPage = ({ currentStep, onContinue, answers, completedGroups, onEmailL
   const [continueUrl, setContinueUrl] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
+
+  const nextGroupButtonRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      const timeoutId = setTimeout(() => {
+        if (nextGroupButtonRef.current) {
+          nextGroupButtonRef.current.focus();
+        }
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isOpen]);
+
+
 
   console.log('completedGroups', completedGroups);
   const onSave = async () => {
@@ -80,8 +96,8 @@ const BreakPage = ({ currentStep, onContinue, answers, completedGroups, onEmailL
         color="teal" 
         size='lg' 
         onClick={onContinue}
-        autoFocus
-        >
+        ref={nextGroupButtonRef}
+        autoFocus>
           Next Group
           </Button>
         </div>
